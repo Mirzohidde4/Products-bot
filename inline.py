@@ -40,11 +40,11 @@ for kategoriya in sorted_products:
 product = InlineKeyboardBuilder()
 for mahsulot in range(len(sorted_products)):
     product.add(InlineKeyboardButton(text=kategoriyalar[mahsulot], callback_data=f"categ_{sorted_products[mahsulot]}"))
-product.add(InlineKeyboardButton(text="🔙 Back", callback_data="categ_back"))
+product.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="categ_back"))
 product.adjust(2)
 
 
 korzin = InlineKeyboardBuilder()
 korzin.add(InlineKeyboardButton(text="➕ Savatga qo`shish", callback_data="savat_qoshish"))
-korzin.add(InlineKeyboardButton(text="🔙 Back", callback_data="savat_back"))
+korzin.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savat_back"))
 korzin.adjust(2)
