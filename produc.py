@@ -2,6 +2,8 @@ import requests
 from pprint import pprint
 from googletrans import Translator
 tr = Translator()
+import sqlite3
+from sqlite3 import Error
 
 
 dummy = []
@@ -16,8 +18,8 @@ trans = []
 #     products.append(m['category'])
 #     dummy.append(m['category'])
 
-url1 = requests.get('https://fakestoreapi.com/products').json()
-for n in url1:
+# url1 = requests.get('https://fakestoreapi.com/products').json()
+# for n in url1:
     # a = tr.translate(text=n['title'], dest='uz')
     # trans.append(a.text)
     # b = tr.translate(text=n['category'], dest='uz')
@@ -29,12 +31,12 @@ for n in url1:
 # pprint(trans)
 
 
-    soz = n['title'].split()
-    # print(soz)
-    yangi_soz = ""
-    for s in range(3):
-        yangi_soz += f"{soz[s]} "
-    print(yangi_soz)
+    # soz = n['title'].split()
+    # # print(soz)
+    # yangi_soz = ""
+    # for s in range(3):
+    #     yangi_soz += f"{soz[s]} "
+    # print(yangi_soz)
 
 
 
@@ -46,3 +48,32 @@ for n in url1:
 # for f in range(3):
 #     dd += f"{sss[f]} "
 # print(dd)
+
+
+
+def read_db():
+    try:
+        sqliteconnection = sqlite3.connect("sqlite3.db")
+        sql_query = """
+            SELECT * FROM Products 
+        """
+    
+        cursor = sqliteconnection.cursor()
+        cursor.execute(sql_query) 
+        A = cursor.fetchall()
+        return A
+
+    except Error as error:
+        print("xatolik", error)
+    finally:
+        if sqliteconnection:
+            cursor.close()
+            sqliteconnection.close()
+            print("sqlite faoliyatini tugatdi")
+
+for i in read_db():
+    # if i[0] == "795303467" and i[1] == "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s":
+    #     # son = int(i[4]) + 1
+    #     print('yes')
+    #     break
+    print(i[1])

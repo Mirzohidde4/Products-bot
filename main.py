@@ -10,7 +10,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import TOKEN
 from inline import start_btn, product, url, url1, fake, dummy, korzin
 from googletrans import Translator 
-from datebase import Add_Db
+from datebase import Add_Db, read_db, UpdateSoni
 
 
 logging.basicConfig(level=logging.INFO)
@@ -112,7 +112,7 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
 
                     await state.update_data(
                         {
-                            'title': j["title"],
+                            'title': j['title'],
                             'image': j['images'][0],
                             'price': j['price']
                         }
@@ -131,7 +131,7 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
                     
                     await state.update_data(
                         {
-                            'title': i["title"],
+                            'title': yangi_soz,
                             'image': i['image'],
                             'price': i['price']
                         }
@@ -148,11 +148,11 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
         await call.message.delete()
         data = await state.get_data()
         api = data.get("api")
-        soz = data.get("br")
+        gap = data.get("br")
 
         if api == "dummy":
             for i in url['products']:
-                if i["category"] == soz:
+                if i["category"] == gap:
                     tarjima = tr.translate(text=i["title"], dest='uz').text
                     btn.add(InlineKeyboardButton(text=tarjima, callback_data=f"title_{i["title"]}"))
             btn.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="title_back"))
@@ -161,7 +161,7 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
 
         elif api == "fake":
             for i in url1:
-                if i["category"] == br:
+                if i["category"] == gap:
                     tarjima = tr.translate(text=i["title"], dest='uz').text
                     soz = tarjima.split()
                     back = i['title'].split()
@@ -185,10 +185,20 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
         price = data.get("price")
 
         try:
-            Add_Db(chat_id=chat_id, title=title, image=image, price=price)
-            await call.message.answer("Mahsulot savatga qo'shildi")
+            for i in read_db():
+                if i[0] == chat_id and i[1] == str(title):
+                    print(f"\n\n{i[0], i[1]}\n\n")
+                    son = i[4] + 1
+                    UpdateSoni(soni=son, chat_id=chat_id)
+                    await call.answer("Mahsulot savatga qo'shildi")
+                    break
+
+                else:
+                    Add_Db(chat_id=chat_id, title=title, image=image, price=price)
+                    await call.answer("Mahsulot savatga qo'shildi")
+                    break
         except:
-            await call.message.answer("Xatolik yuz berdi")
+            await call.answer("Xatolik yuz berdi", show_alert=True)
 
 
 

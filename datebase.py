@@ -46,3 +46,38 @@ def Add_Db(chat_id, title, image, price, soni=1):
         if connection:
             connection.close()
             print("Sqlite ish foalyatini tugatdi")                        
+
+
+def read_db():
+    try:
+        sqliteconnection = sqlite3.connect("sqlite3.db")
+        sql_query = """
+            SELECT * FROM Products 
+        """
+    
+        cursor = sqliteconnection.cursor()
+        cursor.execute(sql_query) 
+        A = cursor.fetchall()
+        return A
+
+    except Error as error:
+        print("xatolik", error)
+    finally:
+        if sqliteconnection:
+            cursor.close()
+            sqliteconnection.close()
+            print("sqlite faoliyatini tugatdi")
+# read_db()            
+
+
+def UpdateSoni(soni, chat_id):
+    try:
+        with sqlite3.connect("sqlite3.db") as con:
+            cur = con.cursor()
+            cur.execute(
+                "UPDATE Products SET soni = ? WHERE chat_id = ?", (soni, chat_id)
+            )
+            con.commit()
+            print("mahsulot soni yangilandi")
+    except sqlite3.Error as err:
+        print(f"Yangilashda xatolik: {err}")
