@@ -6,7 +6,7 @@ tr = Translator()
 
 
 main_btn = {
-   '🛒 Savat': "savat",
+   '🛒 Savat': "savatcha",
    "🛍 Mahsulotlar": "mahsulotlar"
 }
 start_btn = InlineKeyboardBuilder()
@@ -30,8 +30,8 @@ for n in url1:
     products.append(n['category'])
     fake.append(n['category'])
 
-sorted_products = sorted(set(products))
 
+sorted_products = sorted(set(products))
 kategoriyalar = []
 for kategoriya in sorted_products:   
     tarjima = tr.translate(text=kategoriya, dest='uz')

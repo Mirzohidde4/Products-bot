@@ -30,6 +30,22 @@ async def smd_start(message: Message, state: FSMContext):
         caption=f"Assalomu alaykum {html.bold(user)}\nOnlayn do'kon botimizga xush kelibsiz!", reply_markup=start_btn.as_markup())
 
 
+@dp.callback_query(F.data == "savatcha") 
+async def products(call: CallbackQuery, state: FSMContext):
+    await call.message.delete()
+    data = await state.get_data()
+    chat_id = data.get("chat_id")
+    
+    savat = InlineKeyboardBuilder()
+    read = read_db()
+    for i in read:
+        if i[0] == chat_id:
+            savat.add(InlineKeyboardButton(text=i[1], callback_data=f"savatcha_{i[1]}"))
+    savat.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savatcha_back"))
+    savat.adjust(2)        
+    await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())
+
+
 @dp.callback_query(F.data == "mahsulotlar") 
 async def products(call: CallbackQuery):
     await call.message.delete()
@@ -185,12 +201,14 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
         price = data.get("price")
 
         try:
-            for i in read_db():
-                if i[0] == chat_id and i[1] == str(title):
-                    print(f"\n\n{i[0], i[1]}\n\n")
-                    son = i[4] + 1
-                    UpdateSoni(soni=son, chat_id=chat_id)
-                    await call.answer("Mahsulot savatga qo'shildi")
+            read = read_db()
+            print(f"\n\n{chat_id, title}\n\n")
+            for i in read: 
+                if (str(i[0]) == str(chat_id)):
+                    print(True)
+                    # son = i[4] + 1
+                    # UpdateSoni(soni=son, chat_id=chat_id)
+                    # await call.answer("Mahsulot savatga qo'shildi")
                     break
 
                 else:

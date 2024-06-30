@@ -71,9 +71,5 @@ def read_db():
             sqliteconnection.close()
             print("sqlite faoliyatini tugatdi")
 
-for i in read_db():
-    # if i[0] == "795303467" and i[1] == "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s":
-    #     # son = int(i[4]) + 1
-    #     print('yes')
-    #     break
-    print(i[1])
+# for i in read_db():
+#     print(i['title'])

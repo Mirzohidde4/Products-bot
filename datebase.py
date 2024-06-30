@@ -29,42 +29,42 @@ def create_table():
 
 def Add_Db(chat_id, title, image, price, soni=1):
     try:
-        connection = sqlite3.connect('sqlite3.db')
-        cursor = connection.cursor()
-        
-        table = '''
-            INSERT INTO Products(chat_id, title, image, price, soni) VALUES( ?, ?, ?, ?, ?)
-        '''
-        cursor.execute(table, (chat_id, title, image, price, soni))
-        connection.commit()
-        print("SQLite table saqlandi")
-        cursor.close()
+        with sqlite3.connect("sqlite3.db") as connection:
+            cursor = connection.cursor()
+            
+            table = '''
+                INSERT INTO Products(chat_id, title, image, price, soni) VALUES( ?, ?, ?, ?, ?)
+            '''
+            cursor.execute(table, (chat_id, title, image, price, soni))
+            connection.commit()
+            print("SQLite tablega qo'shildi")
+            cursor.close()
 
     except sqlite3.Error as error:
         print("Error while creating a sqlite table", error)
     finally:
         if connection:
             connection.close()
-            print("Sqlite ish foalyatini tugatdi")                        
-
+            print("Sqlite ish foalyatini tugatdi")                         
+# Add_Db(432423, 'gtgtr', 'https://avatars.mds.yandex.net/i?id=b535fd93db7d3b37ec3ff6c027245af8273a225747e8cdbf-6496990-images-thumbs&n=13', '32')
 
 def read_db():
     try:
-        sqliteconnection = sqlite3.connect("sqlite3.db")
-        sql_query = """
-            SELECT * FROM Products 
-        """
-    
-        cursor = sqliteconnection.cursor()
-        cursor.execute(sql_query) 
-        A = cursor.fetchall()
-        return A
+        with sqlite3.connect("sqlite3.db") as sqliteconnection:
+            cursor = sqliteconnection.cursor()
+            sql_query = """
+                SELECT * FROM Products 
+            """
+        
+            cursor.execute(sql_query) 
+            A = cursor.fetchall()
+            print("table oqildi")
+            return A
 
     except Error as error:
-        print("xatolik", error)
+        print("xatolik:", error)
     finally:
         if sqliteconnection:
-            cursor.close()
             sqliteconnection.close()
             print("sqlite faoliyatini tugatdi")
 # read_db()            
@@ -79,5 +79,33 @@ def UpdateSoni(soni, chat_id):
             )
             con.commit()
             print("mahsulot soni yangilandi")
+            cur.close()
+
     except sqlite3.Error as err:
         print(f"Yangilashda xatolik: {err}")
+    finally:
+        if con:
+            con.close()
+            print("Sqlite ish foalyatini tugatdi")    
+
+
+def delete_db(chat_id):
+    try:
+        with sqlite3.connect('sqlite3.db') as connection:
+            cursor = connection.cursor()
+
+            query = '''
+                DELETE FROM Products WHERE chat_id = ?
+            '''
+            cursor.execute(query, (chat_id,))
+            connection.commit()
+            print("mahsulot o'chirildi")
+            cursor.close()
+    
+    except sqlite3.Error as error:
+        print("Error while creating a sqlite table", error)
+    finally:
+        if connection:
+            connection.close()
+            print("Sqlite ish foalyatini tugatdi")
+# delete_db(795303467)
