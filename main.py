@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import TOKEN
-from inline import start_btn, product, url, url1, fake, dummy, korzin
+from inline import start_btn, product, url, url1, fake, dummy, korzin, soni
 from googletrans import Translator 
 from datebase import Add_Db, read_db, UpdateSoni
 
@@ -17,6 +17,7 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 tr = Translator()
+soni = soni
 
 
 @dp.message(CommandStart())
@@ -192,6 +193,37 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
             btn.adjust(2)
             await call.message.answer("Mahsulotlar", reply_markup=btn.as_markup())   
 
+    elif br == 'plus':
+        if soni >= 50: 
+            pass
+        else:
+            # await call.message.delete()
+            soni += 1
+            data = await state.get_data()
+            api = data.get("api")
+            title = data.get("title")
+            image = data.get("image")
+            price = data.get("price")
+
+            if api == "dummy":
+                for j in url["products"]:
+                    if j["title"] == br:
+                        coment = tr.translate(text=j['description'], dest='uz')
+                        await call.message.answer_photo(photo=j['images'][0],
+                            caption=f"narx: {j['price']}$\n{coment.text}", reply_markup=korzin.as_markup())
+                        
+            elif api == "fake":                
+                for i in url1:
+                    soz = i['title'].split()
+                    yangi_soz = ""
+                    for s in range(3):
+                        yangi_soz += f"{soz[s]} " 
+                    if yangi_soz == br:
+                        coment = tr.translate(text=i['description'], dest='uz')
+                        await call.message.answer_photo(photo=i['image'],
+                            caption=f"narx: {i['price']}$\n{coment.text}", reply_markup=korzin.as_markup())            
+
+
 
     elif br == "qoshish":
         data = await state.get_data()
@@ -201,20 +233,19 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
         price = data.get("price")
 
         try:
-            read = read_db()
-            print(f"\n\n{chat_id, title}\n\n")
-            for i in read: 
-                if (str(i[0]) == str(chat_id)):
-                    print(True)
-                    # son = i[4] + 1
-                    # UpdateSoni(soni=son, chat_id=chat_id)
-                    # await call.answer("Mahsulot savatga qo'shildi")
-                    break
+            # read = read_db()
+            # print(f"\n\n{chat_id, title}\n\n")
+            # for i in read: 
+            #     if i[0] == 795303467:
+            #         print(True)
+            #         # son = i[4] + 1
+            #         # UpdateSoni(soni=son, chat_id=chat_id)
+            #         # await call.answer("Mahsulot savatga qo'shildi")
+            #         break
 
-                else:
-                    Add_Db(chat_id=chat_id, title=title, image=image, price=price)
-                    await call.answer("Mahsulot savatga qo'shildi")
-                    break
+            #     else:
+                Add_Db(chat_id=chat_id, title=title, image=image, price=price)
+                await call.answer("Mahsulot savatga qo'shildi")
         except:
             await call.answer("Xatolik yuz berdi", show_alert=True)
 
@@ -228,3 +259,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except:
         print("bot o`chdi")      
+        

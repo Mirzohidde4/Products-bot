@@ -31,7 +31,7 @@ for n in url1:
     fake.append(n['category'])
 
 
-sorted_products = sorted(set(products))
+sorted_products = sorted(set(products)) 
 kategoriyalar = []
 for kategoriya in sorted_products:   
     tarjima = tr.translate(text=kategoriya, dest='uz')
@@ -43,8 +43,10 @@ for mahsulot in range(len(sorted_products)):
 product.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="categ_back"))
 product.adjust(2)
 
-
+soni = 1
 korzin = InlineKeyboardBuilder()
-korzin.add(InlineKeyboardButton(text="➕ Savatga qo`shish", callback_data="savat_qoshish"))
+korzin.add(InlineKeyboardButton(text=f"➕ {soni}x", callback_data="savat_plus"))
+korzin.add(InlineKeyboardButton(text=f"➖ {soni}x", callback_data="savat_minus"))
+korzin.add(InlineKeyboardButton(text="Savatga qoshish", callback_data="savat_qoshish"))
 korzin.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savat_back"))
 korzin.adjust(2)
