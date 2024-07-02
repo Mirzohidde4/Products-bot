@@ -1,15 +1,42 @@
-import requests
+# import requests
 from pprint import pprint
-from googletrans import Translator
-tr = Translator()
+# from googletrans import Translator
+# tr = Translator()
 import sqlite3
 from sqlite3 import Error
+from inline import soni
 
 
-dummy = []
-fake = []
-products = []
-trans = []
+# soni[0] = 2
+print(soni)
+
+# def UpdateSoni(soni, chat_id):
+#     try:
+#         with sqlite3.connect("sqlite3.db") as con:
+#             cur = con.cursor()
+#             cur.execute(
+#                 "UPDATE Products SET soni = ? WHERE chat_id = ?", (soni, chat_id)
+#             )
+#             con.commit()
+#             print("mahsulot soni yangilandi")
+#             cur.close()
+
+#     except Error as err:
+#         print(f"Yangilashda xatolik: {err}")
+#     finally:
+#         if con:
+#             con.close()
+#             print("Sqlite ish foalyatini tugatdi")  
+# UpdateSoni(4, 432423)
+
+
+
+
+
+# dummy = []
+# fake = []
+# products = []
+# trans = []
 
 # url = requests.get('https://dummyjson.com/products').json() 
 # for m in url['products']:
@@ -51,25 +78,25 @@ trans = []
 
 
 
-def read_db():
-    try:
-        sqliteconnection = sqlite3.connect("sqlite3.db")
-        sql_query = """
-            SELECT * FROM Products 
-        """
+# def read_db():
+#     try:
+#         sqliteconnection = sqlite3.connect("sqlite3.db")
+#         sql_query = """
+#             SELECT * FROM Products 
+#         """
     
-        cursor = sqliteconnection.cursor()
-        cursor.execute(sql_query) 
-        A = cursor.fetchall()
-        return A
+#         cursor = sqliteconnection.cursor()
+#         cursor.execute(sql_query) 
+#         A = cursor.fetchall()
+#         return A
 
-    except Error as error:
-        print("xatolik", error)
-    finally:
-        if sqliteconnection:
-            cursor.close()
-            sqliteconnection.close()
-            print("sqlite faoliyatini tugatdi")
+#     except Error as error:
+#         print("xatolik", error)
+#     finally:
+#         if sqliteconnection:
+#             cursor.close()
+#             sqliteconnection.close()
+#             print("sqlite faoliyatini tugatdi")
 
 # for i in read_db():
 #     print(i['title'])

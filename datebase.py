@@ -10,6 +10,7 @@ def create_table():
                     chat_id BIGINT NOT NULL ,
                     title TEXT NOT NULL,
                     image TEXT NOT NULL,
+                    description TEXT NOT NULL,
                     price INTEGER NOT NULL,
                     soni INTEGER NOT NULL
                 ); """
@@ -27,15 +28,15 @@ def create_table():
 # create_table()
             
 
-def Add_Db(chat_id, title, image, price, soni=1):
+def Add_Db(chat_id, title, image, description, price, soni=1):
     try:
         with sqlite3.connect("sqlite3.db") as connection:
             cursor = connection.cursor()
             
             table = '''
-                INSERT INTO Products(chat_id, title, image, price, soni) VALUES( ?, ?, ?, ?, ?)
+                INSERT INTO Products(chat_id, title, image, description, price, soni) VALUES( ?, ?, ?, ?, ?, ?)
             '''
-            cursor.execute(table, (chat_id, title, image, price, soni))
+            cursor.execute(table, (chat_id, title, image, description, price, soni))
             connection.commit()
             print("SQLite tablega qo'shildi")
             cursor.close()
@@ -89,15 +90,15 @@ def UpdateSoni(soni, chat_id):
             print("Sqlite ish foalyatini tugatdi")    
 
 
-def delete_db(chat_id):
+def delete_db(chat_id, title):
     try:
         with sqlite3.connect('sqlite3.db') as connection:
             cursor = connection.cursor()
 
             query = '''
-                DELETE FROM Products WHERE chat_id = ?
+                DELETE FROM Products WHERE (chat_id, title) = (?, ?)
             '''
-            cursor.execute(query, (chat_id,))
+            cursor.execute(query, (chat_id, title))
             connection.commit()
             print("mahsulot o'chirildi")
             cursor.close()
@@ -108,4 +109,4 @@ def delete_db(chat_id):
         if connection:
             connection.close()
             print("Sqlite ish foalyatini tugatdi")
-# delete_db(795303467)
+# delete_db(795303467, "Kiwi")

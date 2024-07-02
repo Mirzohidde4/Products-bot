@@ -8,16 +8,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import TOKEN
-from inline import start_btn, product, url, url1, fake, dummy, korzin, soni
+from inline import start_btn, product, url, url1, fake, dummy, korzin, savatcha
 from googletrans import Translator 
-from datebase import Add_Db, read_db, UpdateSoni
+from datebase import Add_Db, read_db, UpdateSoni, delete_db
 
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 tr = Translator()
-soni = soni
 
 
 @dp.message(CommandStart())
@@ -33,19 +32,94 @@ async def smd_start(message: Message, state: FSMContext):
 
 @dp.callback_query(F.data == "savatcha") 
 async def products(call: CallbackQuery, state: FSMContext):
-    await call.message.delete()
+
     data = await state.get_data()
     chat_id = data.get("chat_id")
     
+    actions = False
     savat = InlineKeyboardBuilder()
     read = read_db()
     for i in read:
         if i[0] == chat_id:
-            savat.add(InlineKeyboardButton(text=i[1], callback_data=f"savatcha_{i[1]}"))
-    savat.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savatcha_back"))
-    savat.adjust(2)        
-    await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())
+            actions = True
+            savat.add(InlineKeyboardButton(text=i[1], callback_data=f"savatcham_{i[1]}"))
 
+    if actions:
+        await call.message.delete()
+        savat.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savatcham_back"))
+        savat.adjust(2)        
+        await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())
+    else:
+        await call.answer(text="sizning savatingiz bo'sh")
+
+
+@dp.callback_query(F.data.startswith('savatcham_'))
+async def get_product(call: CallbackQuery, state: FSMContext):
+    await call.message.delete()
+    action = call.data.split("_")
+    br = action[1]
+    await state.update_data(
+        {'gap': br}
+    )
+
+    if br == "back":
+       await call.message.answer_photo(photo='https://gdetraffic.com/img/news_124/shutterstock_1626190641.jpg',
+        caption=f"🔝 Siz asosiy menyuga qaytdingiz", reply_markup=start_btn.as_markup())
+
+    data = await state.get_data()
+    chat_id = data.get("chat_id")
+
+    read = read_db()
+    for i in read:
+        if i[0] == chat_id and i[1] == br:
+            await call.message.answer_photo(photo=i[2], caption=f"{i[4]}$\n{i[3]}", reply_markup=savatcha.as_markup())
+
+
+@dp.callback_query(F.data.startswith("zakaz_"))
+async def get_zakaz(call: CallbackQuery, state: FSMContext):
+    action = call.data.split("_")
+    br = action[1]
+    data = await state.get_data()
+    chat_id = data.get("chat_id")
+    gap = data.get("gap")
+    savat = InlineKeyboardBuilder()
+
+    if br == "mainback":
+       await call.message.delete()
+       await call.message.answer_photo(photo='https://gdetraffic.com/img/news_124/shutterstock_1626190641.jpg',
+        caption=f"🔝 Siz asosiy menyuga qaytdingiz", reply_markup=start_btn.as_markup())
+
+    elif br == "back":
+        await call.message.delete()
+        read = read_db()
+        for i in read:
+            if i[0] == chat_id:
+                savat.add(InlineKeyboardButton(text=i[1], callback_data=f"savatcham_{i[1]}"))
+        savat.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savatcham_back"))
+        savat.adjust(2)        
+        await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
+
+    elif br == "berish":
+        await call.answer(text="Buyurtmangiz qabul qilindi", show_alert=True)
+
+    elif br == "ochirish":
+        await call.message.delete()
+        read = read_db()
+        for i in read:
+            if i[0] == chat_id and i[1] == gap:
+                try:
+                    delete_db(chat_id=chat_id, title=gap)
+                except:
+                    await call.answer(text="Xatolik yuz berdi")
+
+        read1 = read_db()            
+        for j in read1:
+            if j[0] == chat_id:
+                savat.add(InlineKeyboardButton(text=j[1], callback_data=f"savatcham_{j[1]}"))
+        savat.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savatcham_back"))
+        savat.adjust(2)        
+        await call.answer(text="Mahsulot savatdan o'chirildi")    
+        await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
 
 @dp.callback_query(F.data == "mahsulotlar") 
 async def products(call: CallbackQuery):
@@ -85,6 +159,7 @@ async def brend(call: CallbackQuery, state: FSMContext):
             }
         )
         btn.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="title_back"))
+        btn.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="title_mainback"))
         btn.adjust(2)
         await call.message.answer("Mahsulotlar", reply_markup=btn.as_markup())            
 
@@ -102,6 +177,7 @@ async def brend(call: CallbackQuery, state: FSMContext):
             }
         )
         btn.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="title_back"))
+        btn.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="title_mainback"))
         btn.adjust(2)
         await call.message.answer("Mahsulotlar", reply_markup=btn.as_markup())
 
@@ -110,6 +186,11 @@ async def brend(call: CallbackQuery, state: FSMContext):
 async def get_brend(call: CallbackQuery, state: FSMContext):
     action = call.data.split("_")
     br = action[1]
+
+    if br == "mainback":
+       await call.message.delete()
+       await call.message.answer_photo(photo='https://gdetraffic.com/img/news_124/shutterstock_1626190641.jpg',
+        caption=f"🔝 Siz asosiy menyuga qaytdingiz", reply_markup=start_btn.as_markup())
 
     if br == "back":
         await call.message.delete()
@@ -131,7 +212,8 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
                         {
                             'title': j['title'],
                             'image': j['images'][0],
-                            'price': j['price']
+                            'price': j['price'],
+                            'description': coment.text
                         }
                     )           
 
@@ -150,16 +232,22 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
                         {
                             'title': yangi_soz,
                             'image': i['image'],
-                            'price': i['price']
+                            'price': i['price'],
+                            'description': coment.text
                         }
                     )     
 
 
 @dp.callback_query(F.data.startswith("savat_"))
-async def get_brend(call: CallbackQuery, state: FSMContext):
+async def set_brend(call: CallbackQuery, state: FSMContext):
     action = call.data.split("_")
     br = action[1]
     btn = InlineKeyboardBuilder()
+
+    if br == "mainback":
+       await call.message.delete()
+       await call.message.answer_photo(photo='https://gdetraffic.com/img/news_124/shutterstock_1626190641.jpg',
+        caption=f"🔝 Siz asosiy menyuga qaytdingiz", reply_markup=start_btn.as_markup())
 
     if br == "back":
         await call.message.delete()
@@ -193,35 +281,35 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
             btn.adjust(2)
             await call.message.answer("Mahsulotlar", reply_markup=btn.as_markup())   
 
-    elif br == 'plus':
-        if soni >= 50: 
-            pass
-        else:
-            # await call.message.delete()
-            soni += 1
-            data = await state.get_data()
-            api = data.get("api")
-            title = data.get("title")
-            image = data.get("image")
-            price = data.get("price")
-
-            if api == "dummy":
-                for j in url["products"]:
-                    if j["title"] == br:
-                        coment = tr.translate(text=j['description'], dest='uz')
-                        await call.message.answer_photo(photo=j['images'][0],
-                            caption=f"narx: {j['price']}$\n{coment.text}", reply_markup=korzin.as_markup())
+    # elif br == 'plus':
+    #     data = await state.get_data()
+    #     api = data.get("api")
+    #     title = data.get("title")
+    #     image = data.get("image")
+    #     price = data.get("price")
+        
+    #     if soni[0] >= 50: 
+    #         await call.answer(text="Mahsulot soni cheklangan", show_alert=True)
+    #     else:
+    #         await call.message.delete()
+    #         soni[0] = soni[0] + 1
+    #         if api == "dummy":
+    #             for j in url["products"]:
+    #                 if j["title"] == br:
+    #                     coment = tr.translate(text=j['description'], dest='uz')
+    #                     await call.message.answer_photo(photo=j['images'][0],
+    #                         caption=f"narx: {j['price']}$\n{coment.text}", reply_markup=korzin.as_markup())
                         
-            elif api == "fake":                
-                for i in url1:
-                    soz = i['title'].split()
-                    yangi_soz = ""
-                    for s in range(3):
-                        yangi_soz += f"{soz[s]} " 
-                    if yangi_soz == br:
-                        coment = tr.translate(text=i['description'], dest='uz')
-                        await call.message.answer_photo(photo=i['image'],
-                            caption=f"narx: {i['price']}$\n{coment.text}", reply_markup=korzin.as_markup())            
+    #         elif api == "fake":                
+    #             for i in url1:
+    #                 soz = i['title'].split()
+    #                 yangi_soz = ""
+    #                 for s in range(3):
+    #                     yangi_soz += f"{soz[s]} " 
+    #                 if yangi_soz == br:
+    #                     coment = tr.translate(text=i['description'], dest='uz')
+    #                     await call.message.answer_photo(photo=i['image'],
+    #                         caption=f"narx: {i['price']}$\n{coment.text}", reply_markup=korzin.as_markup())            
 
 
 
@@ -231,21 +319,23 @@ async def get_brend(call: CallbackQuery, state: FSMContext):
         title = data.get("title")
         image = data.get("image")
         price = data.get("price")
+        description = data.get("description")
 
         try:
             # read = read_db()
             # print(f"\n\n{chat_id, title}\n\n")
             # for i in read: 
-            #     if i[0] == 795303467:
-            #         print(True)
+                # if i[0] == chat_id:
+                    # print(True + "\n\n\n")
             #         # son = i[4] + 1
             #         # UpdateSoni(soni=son, chat_id=chat_id)
             #         # await call.answer("Mahsulot savatga qo'shildi")
             #         break
 
-            #     else:
-                Add_Db(chat_id=chat_id, title=title, image=image, price=price)
-                await call.answer("Mahsulot savatga qo'shildi")
+                # else:
+            Add_Db(chat_id=chat_id, title=title, image=image, description=description, price=price)
+            await call.answer("Mahsulot savatga qo'shildi")
+                    # break
         except:
             await call.answer("Xatolik yuz berdi", show_alert=True)
 

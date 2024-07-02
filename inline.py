@@ -43,10 +43,19 @@ for mahsulot in range(len(sorted_products)):
 product.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="categ_back"))
 product.adjust(2)
 
-soni = 1
+# soni = [1, 50]
 korzin = InlineKeyboardBuilder()
-korzin.add(InlineKeyboardButton(text=f"➕ {soni}x", callback_data="savat_plus"))
-korzin.add(InlineKeyboardButton(text=f"➖ {soni}x", callback_data="savat_minus"))
+# korzin.add(InlineKeyboardButton(text=f"➕ {soni[0]}x", callback_data="savat_plus"))
+# korzin.add(InlineKeyboardButton(text=f"➖ {soni[0]}x", callback_data="savat_minus"))
 korzin.add(InlineKeyboardButton(text="Savatga qoshish", callback_data="savat_qoshish"))
 korzin.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savat_back"))
+korzin.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="savat_mainback"))
 korzin.adjust(2)
+
+
+savatcha = InlineKeyboardBuilder()
+savatcha.add(InlineKeyboardButton(text="✅ Buyurtma berish", callback_data="zakaz_berish"))
+savatcha.add(InlineKeyboardButton(text="❌ O'chrish", callback_data="zakaz_ochirish"))
+savatcha.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="zakaz_back"))
+savatcha.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="zakaz_mainback"))
+savatcha.adjust(2)
