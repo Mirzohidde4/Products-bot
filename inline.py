@@ -47,7 +47,7 @@ product.adjust(2)
 korzin = InlineKeyboardBuilder()
 # korzin.add(InlineKeyboardButton(text=f"➕ {soni[0]}x", callback_data="savat_plus"))
 # korzin.add(InlineKeyboardButton(text=f"➖ {soni[0]}x", callback_data="savat_minus"))
-korzin.add(InlineKeyboardButton(text="Savatga qoshish", callback_data="savat_qoshish"))
+korzin.add(InlineKeyboardButton(text="➕ Savatga qoshish", callback_data="savat_qoshish"))
 korzin.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="savat_back"))
 korzin.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="savat_mainback"))
 korzin.adjust(2)
@@ -59,3 +59,8 @@ savatcha.add(InlineKeyboardButton(text="❌ O'chrish", callback_data="zakaz_ochi
 savatcha.add(InlineKeyboardButton(text="🔙 Orqaga", callback_data="zakaz_back"))
 savatcha.add(InlineKeyboardButton(text="🔝 Asosiy menyu", callback_data="zakaz_mainback"))
 savatcha.adjust(2)
+
+
+tastiqlash = InlineKeyboardBuilder()
+tastiqlash.add(InlineKeyboardButton(text="✅ Ha", callback_data="tastiqlash_ha"))
+tastiqlash.add(InlineKeyboardButton(text="❌ Yo'q", callback_data="tastiqlash_yoq"))

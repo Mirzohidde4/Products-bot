@@ -12,7 +12,7 @@ def create_table():
                     image TEXT NOT NULL,
                     description TEXT NOT NULL,
                     price INTEGER NOT NULL,
-                    soni INTEGER NOT NULL
+                    soni INTEGER PRIMARY KEY NOT NULL
                 ); """
         cursor = connection.cursor()
         print("databaza yaratildi")
@@ -28,15 +28,15 @@ def create_table():
 # create_table()
             
 
-def Add_Db(chat_id, title, image, description, price, soni=1):
+def Add_Db(chat_id, title, image, description, price):
     try:
         with sqlite3.connect("sqlite3.db") as connection:
             cursor = connection.cursor()
             
             table = '''
-                INSERT INTO Products(chat_id, title, image, description, price, soni) VALUES( ?, ?, ?, ?, ?, ?)
+                INSERT INTO Products(chat_id, title, image, description, price) VALUES( ?, ?, ?, ?, ?)
             '''
-            cursor.execute(table, (chat_id, title, image, description, price, soni))
+            cursor.execute(table, (chat_id, title, image, description, price))
             connection.commit()
             print("SQLite tablega qo'shildi")
             cursor.close()
@@ -47,7 +47,7 @@ def Add_Db(chat_id, title, image, description, price, soni=1):
         if connection:
             connection.close()
             print("Sqlite ish foalyatini tugatdi")                         
-# Add_Db(432423, 'gtgtr', 'https://avatars.mds.yandex.net/i?id=b535fd93db7d3b37ec3ff6c027245af8273a225747e8cdbf-6496990-images-thumbs&n=13', '32')
+# Add_Db(432423, 'gtgtr', 'https://avatars.mds.yandex.net/i?id=b535fd93db7d3b37ec3ff6c027245af8273a225747e8cdbf-6496990-images-thumbs&n=13', 'dasd', 32)
 
 def read_db():
     try:

@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import TOKEN
-from inline import start_btn, product, url, url1, fake, dummy, korzin, savatcha
+from inline import start_btn, product, url, url1, fake, dummy, korzin, savatcha, tastiqlash
 from googletrans import Translator 
 from datebase import Add_Db, read_db, UpdateSoni, delete_db
 
@@ -42,7 +42,8 @@ async def products(call: CallbackQuery, state: FSMContext):
     for i in read:
         if i[0] == chat_id:
             actions = True
-            savat.add(InlineKeyboardButton(text=i[1], callback_data=f"savatcham_{i[1]}"))
+            tarjima = tr.translate(text=i[1], dest='uz').text
+            savat.add(InlineKeyboardButton(text=tarjima, callback_data=f"savatcham_{i[1]}"))
 
     if actions:
         await call.message.delete()
@@ -72,7 +73,7 @@ async def get_product(call: CallbackQuery, state: FSMContext):
     read = read_db()
     for i in read:
         if i[0] == chat_id and i[1] == br:
-            await call.message.answer_photo(photo=i[2], caption=f"{i[4]}$\n{i[3]}", reply_markup=savatcha.as_markup())
+            await call.message.answer_photo(photo=i[2], caption=f"Narx: {i[4]}$\n{i[3]}", reply_markup=savatcha.as_markup())
 
 
 @dp.callback_query(F.data.startswith("zakaz_"))
@@ -100,7 +101,11 @@ async def get_zakaz(call: CallbackQuery, state: FSMContext):
         await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
 
     elif br == "berish":
-        await call.answer(text="Buyurtmangiz qabul qilindi", show_alert=True)
+        await state.update_data(
+            {'chatid': call.from_user.id, 'buy': gap}
+        )
+        await bot.send_message(chat_id="795303467", text=f"Foydalanuvchi {chat_id} - {gap} buyurtma berdi tasdiqlaysizmi?", reply_markup=tastiqlash.as_markup())
+        await call.answer(text="Buyurtmangiz ko'rib chiqilmoqda,\ntez orada habar yuboriladi", show_alert=True)
 
     elif br == "ochirish":
         await call.message.delete()
@@ -120,6 +125,35 @@ async def get_zakaz(call: CallbackQuery, state: FSMContext):
         savat.adjust(2)        
         await call.answer(text="Mahsulot savatdan o'chirildi")    
         await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
+
+
+@dp.callback_query(lambda c: c.data.startswith("tastiqlash_") and c.message.chat.id == 795303467)
+async def Tastiqlash(call: CallbackQuery, state: FSMContext):
+    await call.message.delete()
+    action = call.data.split("_")
+    br = action[1]
+    data1 = await state.get_data()
+    chatid = data1.get("chatid")
+    buy = data1.get("buy")
+    read = read_db()
+
+    if chatid is None:
+        await bot.send_message(call.from_user.id, "Xatolik: chatid topilmadi.")
+        return
+    
+    if buy is None:
+        await bot.send_message(call.from_user.id, "Xatolik: buy topilmadi.")
+        return
+
+    if br == "ha":    
+        for i in read:
+            if i[0] == chatid and i[1] == buy:
+                qod = i[5]
+                await bot.send_message(chat_id=f"{chatid}", text=f"{buy} - buyurtmangiz tastiqlandi qod: {qod}")
+
+    elif br == "yoq":
+        await bot.send_message(chat_id=f"{chatid}", text=f"{buy} - buyurtmangiz tastiqlanmadi, keyinroq qayta urunib ko'ring")
+
 
 @dp.callback_query(F.data == "mahsulotlar") 
 async def products(call: CallbackQuery):
