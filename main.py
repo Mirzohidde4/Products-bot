@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import TOKEN
-from inline import start_btn, product, url, url1, fake, dummy, korzin, savatcha, tastiqlash
+from inline import start_btn, product, url, url1, fake, dummy, korzin, savatcha
 from googletrans import Translator 
 from datebase import Add_Db, read_db, UpdateSoni, delete_db
 
@@ -84,6 +84,7 @@ async def get_zakaz(call: CallbackQuery, state: FSMContext):
     chat_id = data.get("chat_id")
     gap = data.get("gap")
     savat = InlineKeyboardBuilder()
+    tastiqlash = InlineKeyboardBuilder()
 
     if br == "mainback":
        await call.message.delete()
@@ -101,9 +102,8 @@ async def get_zakaz(call: CallbackQuery, state: FSMContext):
         await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
 
     elif br == "berish":
-        await state.update_data(
-            {'chatid': call.from_user.id, 'buy': gap}
-        )
+        tastiqlash.add(InlineKeyboardButton(text="✅ Ha", callback_data=f"tastiqlash_ha_{call.from_user.id}_{gap}"))
+        tastiqlash.add(InlineKeyboardButton(text="❌ Yo'q", callback_data=f"tastiqlash_yoq_{call.from_user.id}_{gap}"))
         await bot.send_message(chat_id="795303467", text=f"Foydalanuvchi {chat_id} - {gap} buyurtma berdi tasdiqlaysizmi?", reply_markup=tastiqlash.as_markup())
         await call.answer(text="Buyurtmangiz ko'rib chiqilmoqda,\ntez orada habar yuboriladi", show_alert=True)
 
@@ -127,14 +127,14 @@ async def get_zakaz(call: CallbackQuery, state: FSMContext):
         await call.message.answer("Sizning savatingiz", reply_markup=savat.as_markup())        
 
 
-@dp.callback_query(lambda c: c.data.startswith("tastiqlash_") and c.message.chat.id == 795303467)
+@dp.callback_query(F.data.startswith("tastiqlash_"))
 async def Tastiqlash(call: CallbackQuery, state: FSMContext):
     await call.message.delete()
     action = call.data.split("_")
     br = action[1]
-    data1 = await state.get_data()
-    chatid = data1.get("chatid")
-    buy = data1.get("buy")
+    chatid = action[2]
+    buy = action[3]
+
     read = read_db()
 
     if chatid is None:
@@ -144,12 +144,17 @@ async def Tastiqlash(call: CallbackQuery, state: FSMContext):
     if buy is None:
         await bot.send_message(call.from_user.id, "Xatolik: buy topilmadi.")
         return
+    print(f"\n\n{chatid, buy}\n\n")
 
     if br == "ha":    
         for i in read:
-            if i[0] == chatid and i[1] == buy:
+            if (int(i[0]) == int(chatid)) and (i[1].strip() == buy.strip()):
                 qod = i[5]
-                await bot.send_message(chat_id=f"{chatid}", text=f"{buy} - buyurtmangiz tastiqlandi qod: {qod}")
+                print(qod)
+                try:
+                    await bot.send_message(chat_id=f"{chatid}", text=f"{buy} - buyurtmangiz tastiqlandi qod: {qod}")
+                except:
+                    print("Xatolik")
 
     elif br == "yoq":
         await bot.send_message(chat_id=f"{chatid}", text=f"{buy} - buyurtmangiz tastiqlanmadi, keyinroq qayta urunib ko'ring")
